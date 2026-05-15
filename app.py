@@ -10,17 +10,23 @@ import streamlit as st
 from dotenv import load_dotenv, find_dotenv
 
 # Streamlit Cloud 환경에서 Playwright Chromium 자동 설치
-@st.cache_resource(show_spinner=False)
+@st.cache_resource(show_spinner="이미지 렌더러 준비 중...")
 def _install_playwright():
-    try:
-        from playwright.sync_api import sync_playwright
-        with sync_playwright() as p:
-            p.chromium.launch()  # 브라우저 존재 확인
-    except Exception:
-        subprocess.run(
-            [sys.executable, "-m", "playwright", "install", "chromium"],
-            check=True, capture_output=True,
+    import os
+    cache_dir = Path.home() / ".cache" / "ms-playwright"
+    if cache_dir.exists() and list(cache_dir.glob("chromium-*/chrome-linux/chrome")):
+        return True
+    result = subprocess.run(
+        [sys.executable, "-m", "playwright", "install", "chromium"],
+        capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        st.error(
+            "Playwright Chromium 설치 실패\n\n"
+            f"stdout:\n{result.stdout}\n\nstderr:\n{result.stderr}"
         )
+        st.stop()
+    return True
 
 _install_playwright()
 

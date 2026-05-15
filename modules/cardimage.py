@@ -131,7 +131,9 @@ def generate_images(cardnews_md: str, output_dir: Path) -> list[Path]:
     paths = []
 
     with sync_playwright() as pw:
-        browser = pw.chromium.launch()
+        browser = pw.chromium.launch(
+            args=["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
+        )
         page = browser.new_page(viewport={"width": 1080, "height": 1080})
 
         for i, slide in enumerate(slides):
