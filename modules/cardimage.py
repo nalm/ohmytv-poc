@@ -22,11 +22,14 @@ SLIDE_HTML = """\
 <html>
 <head>
 <meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   * {{ margin: 0; padding: 0; box-sizing: border-box; }}
   body {{
     width: 1080px; height: 1080px; overflow: hidden;
-    font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif;
+    font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
     background: linear-gradient(135deg, #{grad_from}, #{grad_to});
     display: flex; flex-direction: column;
     justify-content: space-between;
@@ -147,7 +150,9 @@ def generate_images(cardnews_md: str, output_dir: Path) -> list[Path]:
                 subtitle=slide["subtitle"],
                 headline_size=_headline_fontsize(slide["headline"]),
             )
-            page.set_content(html, wait_until="domcontentloaded")
+            page.set_content(html, wait_until="networkidle")
+            # 웹폰트 로딩 완료 대기
+            page.evaluate("document.fonts.ready")
             out = img_dir / f"slide_{i+1:02d}.png"
             page.screenshot(path=str(out), clip={"x": 0, "y": 0, "width": 1080, "height": 1080})
             paths.append(out)
