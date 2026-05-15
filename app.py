@@ -18,7 +18,7 @@ def _install_playwright():
             p.chromium.launch()  # 브라우저 존재 확인
     except Exception:
         subprocess.run(
-            [sys.executable, "-m", "playwright", "install", "chromium", "--with-deps"],
+            [sys.executable, "-m", "playwright", "install", "chromium"],
             check=True, capture_output=True,
         )
 
