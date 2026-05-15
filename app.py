@@ -1,5 +1,6 @@
 """OhmyTV 영상 → 기사 + 카드뉴스 웹앱."""
 
+import subprocess
 import sys
 import zipfile
 import io
@@ -7,6 +8,21 @@ from pathlib import Path
 
 import streamlit as st
 from dotenv import load_dotenv, find_dotenv
+
+# Streamlit Cloud 환경에서 Playwright Chromium 자동 설치
+@st.cache_resource(show_spinner=False)
+def _install_playwright():
+    try:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            p.chromium.launch()  # 브라우저 존재 확인
+    except Exception:
+        subprocess.run(
+            [sys.executable, "-m", "playwright", "install", "chromium", "--with-deps"],
+            check=True, capture_output=True,
+        )
+
+_install_playwright()
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
